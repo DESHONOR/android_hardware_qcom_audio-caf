@@ -728,7 +728,7 @@ AudioStreamIn* AudioHardware::openInputStream(
     mLock.lock();
 
     AudioStreamIn *in;
-    if((devices == AUDIO_DEVICE_IN_COMMUNICATION)&& (*sampleRate == 8000)) {
+    if(devices == AUDIO_DEVICE_IN_COMMUNICATION) {
         ALOGV("Create Audio stream Voip \n");
         AudioStreamInVoip* inVoip = new AudioStreamInVoip();
         status_t lStatus = NO_ERROR;
@@ -1986,20 +1986,15 @@ status_t AudioHardware::AudioStreamOutDirect::set(
     if (lChannels == 0) lChannels = channels();
     if (lRate == 0) lRate = sampleRate();
 
-    // check values
-    if ((lFormat != format()) ||
-        (lChannels != channels()) ||
-        (lRate != sampleRate())) {
-        if (pFormat) *pFormat = format();
-        if (pChannels) *pChannels = channels();
-        if (pRate) *pRate = sampleRate();
-        ALOGE("  AudioStreamOutDirect::set return bad values\n");
-        return BAD_VALUE;
-    }
-
     if (pFormat) *pFormat = lFormat;
     if (pChannels) *pChannels = lChannels;
     if (pRate) *pRate = lRate;
+
+    if (lFormat != format() ||
+        lChannels != channels()) {
+        ALOGE("  AudioStreamOutDirect::set return bad values\n");
+        return BAD_VALUE;
+    }
 
     mDevices = devices;
     mChannels = lChannels;
